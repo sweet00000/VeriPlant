@@ -216,7 +216,7 @@ button:focus-visible { outline: 2px solid var(--leaf); outline-offset: 2px; }
 </style>
 <script>
   // ▼ Paste your Google Apps Script web app URL here (see README.md). It ends in /exec.
-  window.FEEDBACK_URL = 'https://script.google.com/macros/s/AKfycbxn1aKbzb-n05N11eC08yBH8mTBlcKG_70rS0UqCM8VXtUVHkYaq2CrEEyHUqQcYis9/exec';
+  window.FEEDBACK_URL = 'https://script.google.com/macros/s/AKfycbweXyg-1I0ErFdRXJrIyquPyz4obaNYrxx-IDX3CYhhbyU9MCSHgUfrI9ynXla0trX7/exec';
 </script>
 </head>
 <body>
@@ -287,7 +287,7 @@ button:focus-visible { outline: 2px solid var(--leaf); outline-offset: 2px; }
     <div class="notice" id="fbNotice" hidden></div>
     <div class="done" id="fbDone" role="status" hidden>Thanks! Your feedback was saved. The form is ready for the next person.</div>
     <fieldset>
-      <legend>Overall, how would you rate this design?</legend>
+      <legend>Overall, how would you rate this design? <small>Required</small></legend>
       <div class="stars" id="stars" role="radiogroup" aria-label="Rating out of 5"></div>
     </fieldset>
     <fieldset>
@@ -296,20 +296,20 @@ button:focus-visible { outline: 2px solid var(--leaf); outline-offset: 2px; }
       <div class="scale-ends"><span>Not likely</span><span>Very likely</span></div>
     </fieldset>
     <fieldset>
-      <legend>What would you expect to pay?</legend>
-      <div class="chips" data-single="price"></div>
+      <legend>What would you expect to pay? <small>Pick any</small></legend>
+      <div class="chips" data-multi="price"></div>
     </fieldset>
     <fieldset>
       <legend>What would you grow in it? <small>Pick any</small></legend>
       <div class="chips" data-multi="grow"></div>
     </fieldset>
     <fieldset>
-      <legend>Which feature matters most to you?</legend>
-      <div class="chips" data-single="feature"></div>
+      <legend>Which features matter most to you? <small>Pick any</small></legend>
+      <div class="chips" data-multi="feature"></div>
     </fieldset>
     <fieldset>
-      <legend>Where would you put it?</legend>
-      <div class="chips" data-single="place"></div>
+      <legend>Where would you put it? <small>Pick any</small></legend>
+      <div class="chips" data-multi="place"></div>
     </fieldset>
     <fieldset>
       <label class="q" for="comments">Suggestions, comments or questions</label>
@@ -749,7 +749,7 @@ button:focus-visible { outline: 2px solid var(--leaf); outline-offset: 2px; }
     feature: ['Automatic watering', 'Smart grow light', 'Humidity & climate control', 'Plant-health camera alerts', 'Looks & design'],
     place: ['Kitchen', 'Living room', 'Bedroom', 'Office', 'Somewhere else'],
   };
-  const blank = () => ({ rating: 0, buy: 0, price: '', grow: [], feature: '', place: '' });
+  const blank = () => ({ rating: 0, buy: 0, price: [], grow: [], feature: [], place: [] });
   const state = blank();
   $('infoBtn').addEventListener('click', () => {
     const open = $('spec').classList.toggle('open');
@@ -832,8 +832,8 @@ button:focus-visible { outline: 2px solid var(--leaf); outline-offset: 2px; }
     if (!state.rating) { status('Pick a star rating first.', 'err'); $('fbForm').scrollTop = 0; stars.firstChild.focus(); return; }
     saving = true; status('Saving…'); $('fbDone').hidden = true;
     const body = {
-      rating: state.rating, buy: state.buy || '', price: state.price || '', grow: state.grow.slice(),
-      feature: state.feature || '', place: state.place || '',
+      rating: state.rating, buy: state.buy || '',
+      price: state.price.slice(), grow: state.grow.slice(), feature: state.feature.slice(), place: state.place.slice(),
       name: $('fbName').value.trim().slice(0, 120),
       comments: $('comments').value.trim().slice(0, 4000), contact: $('contact').value.trim().slice(0, 200),
       website: $('website').value,
