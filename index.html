@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Interactive 3D model of our grow enclosure prototype. Spin it around and tell us what you think.">
-<title>Grow Enclosure Prototype</title>
+<meta name="description" content="Grow your favorite plants even in your apartment. Explore the VeriPlant Prototype, a compact enclosure designed for automated plant care, and share your feedback.">
+<title>VeriPlant Prototype</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -73,6 +73,19 @@ body {
   backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
   padding: 18px 20px; display: grid; gap: 14px;
 }
+.spec { box-sizing: border-box; max-height: calc(100dvh - 200px); overflow-y: auto; }
+.intro { display: grid; gap: 8px; font-size: 13px; line-height: 1.4; }
+.intro p { margin: 0; color: var(--ink-soft); }
+.intro .tagline { font-size: 17px; font-weight: 500; color: var(--ink); text-wrap: balance; }
+.mobile-summary { display: none; }
+.climate-details { display: grid; gap: 8px; }
+.climate-list { margin: 0; padding-left: 17px; display: grid; gap: 5px; color: var(--ink-soft); }
+.climate-list strong { color: var(--ink); font-weight: 500; }
+.free-response { display: grid; gap: 5px; margin-top: 4px; }
+.free-response label, .written-count { font-size: 12px; color: var(--ink-soft); line-height: 1.4; }
+.free-response textarea { min-height: 68px; }
+.written-count { margin: 0; }
+.written-count.over-limit { color: var(--danger); }
 .eyebrow {
   font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
   color: var(--leaf);
@@ -194,6 +207,13 @@ button:focus-visible { outline: 2px solid var(--leaf); outline-offset: 2px; }
     padding-block: calc(10px + env(safe-area-inset-top, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)); }
   .spec { max-width: none; align-self: stretch; padding: 10px 12px 10px 14px; gap: 10px; border-radius: 12px; }
   .spec .eyebrow, .spec .dims, .legend { display: none; }
+  .spec { max-height: min(46dvh, calc(100dvh - 190px)); }
+  .spec:not(.open) .climate-details { display: none; }
+  .mobile-summary { display: block; }
+  .spec.open .mobile-summary { display: none; }
+  .intro { font-size: 12px; gap: 6px; }
+  .intro .tagline { font-size: 14px; }
+  .climate-list { gap: 3px; }
   .spec.open .legend { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; }
   .legend small { display: none; }
   h1 { font-size: 17px; }
@@ -204,11 +224,23 @@ button:focus-visible { outline: 2px solid var(--leaf); outline-offset: 2px; }
   .settings { gap: 6px; }
   .cta { font-size: 17px; padding: 16px; }
   .group + .group { border-left: 0; padding-left: 0; }
-  .group-label.view-label { display: none; }
+  .group-label { display: none; }
   .dock button { padding: 8px 10px; }
-  .sheet { inset: auto max(6px, env(safe-area-inset-right, 0px)) max(6px, env(safe-area-inset-bottom, 0px)) max(6px, env(safe-area-inset-left, 0px));
-    top: calc(6px + env(safe-area-inset-top, 0px)); width: auto; height: auto; }
-  .sheet-head { padding: 14px 16px 10px; }
+  .group { gap: 4px; }
+  .dock .settings button { padding: 8px; font-size: 12px; }
+  .sheet { inset: 0; width: auto; height: auto; border-radius: 0; border: 0;
+    padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .sheet-body { min-height: 0; flex: 1; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+  .sheet textarea, .sheet input { font-size: 16px; }
+  .sheet button { min-height: 44px; }
+  .sheet .close { min-width: 44px; }
+  .free-response textarea { min-height: 80px; }
+  .sheet .form-foot { padding-bottom: 8px; }
+  .sheet .form-foot .primary { width: 100%; min-height: 48px; }
+  .dock .cta { min-height: 50px; }
+  .dock .settings button, .info-btn { min-height: 44px; }
+  .settings { column-gap: 8px; row-gap: 6px; }
+  .sheet-head { padding: 12px 16px 10px; flex-shrink: 0; }
   .sheet-body { padding: 14px 16px 24px; }
   .chips button, .scale button { padding: 10px 12px; }
   .stars button { font-size: 34px; padding: 4px 8px; }
@@ -227,11 +259,25 @@ button:focus-visible { outline: 2px solid var(--leaf); outline-offset: 2px; }
   <section class="spec" id="spec" aria-label="Enclosure details">
     <div class="spec-top">
       <div>
-        <div class="eyebrow">Enclosed section assembly</div>
-        <h1>Grow Enclosure Prototype</h1>
+        <div class="eyebrow">Indoor growing enclosure</div>
+        <h1>VeriPlant Prototype</h1>
         <div class="dims-compact">24 × 24 × 41¼ in</div>
       </div>
-      <button class="info-btn" id="infoBtn" aria-expanded="false" aria-controls="legend">Materials</button>
+      <button class="info-btn" id="infoBtn" aria-expanded="false" aria-controls="climateDetails legend">Details</button>
+    </div>
+    <div class="intro">
+      <p class="tagline">Grow your favorite plants even in your apartment.</p>
+      <p class="mobile-summary">Humidity, watering, air circulation and venting, lighting, and temperature control in one compact enclosure.</p>
+      <div class="climate-details" id="climateDetails">
+      <p>We’re developing a compact enclosure designed to manage your plants’ growing conditions with:</p>
+      <ul class="climate-list">
+        <li><strong>Humidity control</strong> to maintain moisture in the air.</li>
+        <li><strong>Automatic watering</strong> to keep plants hydrated.</li>
+        <li><strong>Air circulation and venting</strong> to move air around plants and exchange it with fresh room air.</li>
+        <li><strong>Adjustable grow lighting</strong> to provide light indoors.</li>
+        <li><strong>Temperature control</strong> to help maintain suitable growing conditions.</li>
+      </ul>
+      </div>
     </div>
     <div class="dims" aria-label="Overall size in inches">
       <div><b>24″</b><span>Width</span></div>
@@ -279,7 +325,7 @@ button:focus-visible { outline: 2px solid var(--leaf); outline-offset: 2px; }
     <div>
       <div class="eyebrow">Prototype feedback</div>
       <h2 id="fbTitle">What do you think?</h2>
-      <p>Takes about a minute. Everything is optional except the star rating.</p>
+      <p>Takes about two minutes. Add a written answer to any question. Everything is optional except the star rating.</p>
     </div>
     <button class="close" data-close aria-label="Close feedback">×</button>
   </div>
@@ -289,27 +335,51 @@ button:focus-visible { outline: 2px solid var(--leaf); outline-offset: 2px; }
     <fieldset>
       <legend>Overall, how would you rate this design? <small>Required</small></legend>
       <div class="stars" id="stars" role="radiogroup" aria-label="Rating out of 5"></div>
+      <div class="free-response">
+        <label for="ratingResponse">What led to your rating? <span>(optional)</span></label>
+        <textarea id="ratingResponse" data-response-label="Overall rating" rows="2" maxlength="600" aria-describedby="writtenCount" placeholder="Tell us what you like or what could be improved."></textarea>
+      </div>
     </fieldset>
     <fieldset>
       <legend>How likely would you be to buy one?</legend>
       <div class="scale" id="buy"></div>
       <div class="scale-ends"><span>Not likely</span><span>Very likely</span></div>
+      <div class="free-response">
+        <label for="buyResponse">What would influence your decision to buy? <span>(optional)</span></label>
+        <textarea id="buyResponse" data-response-label="Likelihood of buying" rows="2" maxlength="600" aria-describedby="writtenCount" placeholder="What would make this useful to you?"></textarea>
+      </div>
     </fieldset>
     <fieldset>
       <legend>What would you expect to pay? <small>Pick any</small></legend>
       <div class="chips" data-multi="price"></div>
+      <div class="free-response">
+        <label for="priceResponse">What price would you expect, and why? <span>(optional)</span></label>
+        <textarea id="priceResponse" data-response-label="Expected price" rows="2" maxlength="600" aria-describedby="writtenCount" placeholder="Suggest another price or explain your choices."></textarea>
+      </div>
     </fieldset>
     <fieldset>
       <legend>What would you grow in it? <small>Pick any</small></legend>
       <div class="chips" data-multi="grow"></div>
+      <div class="free-response">
+        <label for="growResponse">What else would you grow? <span>(optional)</span></label>
+        <textarea id="growResponse" data-response-label="Plants to grow" rows="2" maxlength="600" aria-describedby="writtenCount" placeholder="Name specific plants or explain your choices."></textarea>
+      </div>
     </fieldset>
     <fieldset>
       <legend>Which features matter most to you? <small>Pick any</small></legend>
       <div class="chips" data-multi="feature"></div>
+      <div class="free-response">
+        <label for="featureResponse">Which other features would you want, and why? <span>(optional)</span></label>
+        <textarea id="featureResponse" data-response-label="Important features" rows="2" maxlength="600" aria-describedby="writtenCount" placeholder="Add a feature or explain what matters to you."></textarea>
+      </div>
     </fieldset>
     <fieldset>
       <legend>Where would you put it? <small>Pick any</small></legend>
       <div class="chips" data-multi="place"></div>
+      <div class="free-response">
+        <label for="placeResponse">Where else would you put it? <span>(optional)</span></label>
+        <textarea id="placeResponse" data-response-label="Placement" rows="2" maxlength="600" aria-describedby="writtenCount" placeholder="Describe the location or any space constraints."></textarea>
+      </div>
     </fieldset>
     <fieldset>
       <label class="q" for="comments">Suggestions, comments or questions</label>
@@ -323,6 +393,7 @@ button:focus-visible { outline: 2px solid var(--leaf); outline-offset: 2px; }
       <label class="q" for="contact">Email <small>optional, if you’d like a reply or updates</small></label>
       <input type="email" id="contact" maxlength="200" autocomplete="off" placeholder="you@example.com">
     </fieldset>
+    <p class="written-count" id="writtenCount">Written answers share a 4,000-character limit.</p>
     <div style="position:absolute;left:-9999px" aria-hidden="true">
       <label for="website">Leave this empty</label><input type="text" id="website" tabindex="-1" autocomplete="off">
     </div>
@@ -825,17 +896,42 @@ button:focus-visible { outline: 2px solid var(--leaf); outline-offset: 2px; }
     lockForm();
   }
 
+  // Keep the existing Apps Script payload and Sheet columns unchanged.
+  // Optional written answers are labeled within the existing comments field.
+  const responseFields = [...document.querySelectorAll('[data-response-label]')];
+  function combinedComments() {
+    const sections = [$('comments').value.trim()];
+    responseFields.forEach(field => {
+      const value = field.value.trim();
+      if (value) sections.push(field.dataset.responseLabel + ':\n' + value);
+    });
+    return sections.filter(Boolean).join('\n\n');
+  }
+  function updateWrittenCount() {
+    const length = combinedComments().length;
+    $('writtenCount').textContent = 'Written answers: ' + length.toLocaleString() + ' / 4,000 characters (including question labels).';
+    $('writtenCount').classList.toggle('over-limit', length > 4000);
+  }
+  [...responseFields, $('comments')].forEach(field => field.addEventListener('input', updateWrittenCount));
+  updateWrittenCount();
+
   let saving = false, doneTimer = 0;
   $('fbForm').addEventListener('submit', async e => {
     e.preventDefault();
     if (saving || !connected) return;
     if (!state.rating) { status('Pick a star rating first.', 'err'); $('fbForm').scrollTop = 0; stars.firstChild.focus(); return; }
+    const comments = combinedComments();
+    if (comments.length > 4000) {
+      status('Please shorten your written answers by ' + (comments.length - 4000).toLocaleString() + ' characters before sending.', 'err');
+      $('writtenCount').scrollIntoView({ block: 'nearest' });
+      return;
+    }
     saving = true; status('Saving…'); $('fbDone').hidden = true;
     const body = {
       rating: state.rating, buy: state.buy || '',
       price: state.price.slice(), grow: state.grow.slice(), feature: state.feature.slice(), place: state.place.slice(),
       name: $('fbName').value.trim().slice(0, 120),
-      comments: $('comments').value.trim().slice(0, 4000), contact: $('contact').value.trim().slice(0, 200),
+      comments, contact: $('contact').value.trim().slice(0, 200),
       website: $('website').value,
     };
     try {
@@ -843,6 +939,8 @@ button:focus-visible { outline: 2px solid var(--leaf); outline-offset: 2px; }
       await fetch(URL_, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) });
       Object.assign(state, blank()); sync();
       $('fbName').value = ''; $('comments').value = ''; $('contact').value = '';
+      responseFields.forEach(field => { field.value = ''; });
+      updateWrittenCount();
       status('', '');
       $('fbDone').hidden = false; $('fbForm').scrollTop = 0;
       clearTimeout(doneTimer); doneTimer = setTimeout(() => { $('fbDone').hidden = true; }, 6000);
